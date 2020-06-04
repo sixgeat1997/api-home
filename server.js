@@ -70,7 +70,10 @@ const myhome = [
 ]
 
 router.route('/')
-    
+    .get((req, res) => {
+        res.send('<h1> /home --> get,post <Br/> /edit --> delete,put </h1>')
+    })
+
 router.route('/home')
     .get((req, res) => {
         res.json(myhome)
