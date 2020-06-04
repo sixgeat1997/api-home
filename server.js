@@ -69,10 +69,48 @@ const myhome = [
     },
 ]
 
-router.route('/gethome')
+router.route('/')
+    
+router.route('/home')
     .get((req, res) => {
         res.json(myhome)
     })
+    .post((req, res) => {
+        // console.log(req.body);
+        var keephome = {}
+        keephome.id = myhome.length > 0 ? myhome[myhome.length - 1].id + 1 : 0
+        keephome.name = req.body.name
+        keephome.description = req.body.description
+        keephome.location = req.body.location
+        keephome.price = req.body.price
+        keephome.area = req.body.area
+        keephome.type = req.body.type
+        keephome.category = req.body.category
+        keephome.tel = req.body.tel
+        myhome.push(keephome)
+        res.json({ message: "success" })
+    })
+
+router.route('/edit/:id')
+    .delete((req, res) => {
+        var index = myhome.findIndex(p => +p.id === +req.params.id)
+        myhome.splice(index, 1)
+        res.json({ message: "delete" })
+    })
+    .put((req, res) => {
+        var index = myhome.findIndex(p => +p.id === +req.params.id)
+        myhome[index].name = req.body.name
+        myhome[index].description = req.body.description
+        myhome[index].location = req.body.location
+        myhome[index].price = req.body.price
+        myhome[index].area = req.body.area
+        myhome[index].type = req.body.type
+        myhome[index].category = req.body.category
+        myhome[index].tel = req.body.tel
+        res.json({ message: "update" })
+
+    })
+
 
 
 app.use("*", (req, res) => res.status(404).send("404 not found"))
