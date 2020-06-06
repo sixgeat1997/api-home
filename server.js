@@ -2,24 +2,24 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
-const crypto = require('crypto');
-const mongoose = require('mongoose');
+const fs = require('fs')
 const multer = require('multer');
 const helpers = require('./helpers');
-const GridFsStorage = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
-const fs = require('fs')
-const methodOverride = require('method-override');
 const port = process.env.PORT || 8888;
 const app = express()
 const router = express.Router()
+// const crypto = require('crypto');
+// const mongoose = require('mongoose');
+// const GridFsStorage = require('multer-gridfs-storage');
+// const Grid = require('gridfs-stream');
+// const methodOverride = require('method-override');
 
 const server = 'http://localhost:8888'
 
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }), router)
-app.use(express.static(__dirname + '/uploads'));
+// app.use(express.static(path.join(__dirname, "./uploads")));
 app.set("view engine", "ejs")
 
 const myhome = [
@@ -81,12 +81,12 @@ const myhome = [
     },
 ]
 
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/")
+        cb(null, "upload/");
     },
     filename: (req, file, cb) => {
-        // cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
         cb(
             null,
             Date.now() +
@@ -97,97 +97,50 @@ const storage = multer.diskStorage({
                 .replace(",", "_")
         );
     }
-
 })
-// checkFileType = (file, cb) => {
-//     const filetypes = /jpeg|jpg|png|gif/;
-//     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-//     const mimetype = filetypes.test(file.mimetype);
-//     if (mimetype && extname) {
-//         return cb(null, true);
-//     } else {
-//         cb("images only");
-//     }
-// };
 
-// let uploader = multer({
-//     storage,
-//     limits: { fileSize: 9000000 },
-//     fileFilter: (req, file, cb) => {
-//         checkFileType(file, cb);
-//     }
-// }).single("file");
-app.post('/upload-multiple-images', (req, res) => {
-    // 10 is the limit I've defined for number of uploaded files at once
-    // 'multiple_images' is the name of our file input field
-    let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).array('multiple_images', 10);
 
-    upload(req, res, function (err) {
-        if (req.fileValidationError) {
-            return res.send(req.fileValidationError);
+
+let upload = multer({
+    storage: storage,
+    limits: { fileSize: 5000000 },
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif/;
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = filetypes.test(file.mimetype);
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb("images only");
         }
-        // else if (...) // The same as when uploading single images
-
-        let result = "You have uploaded these images: <hr />";
-        const files = req.files;
-        let index, len;
-
-        // Loop through all the uploaded images and display them on frontend
-        for (index = 0, len = files.length; index < len; ++index) {
-            result += `<img src="${files[index].path}" width="300" style="margin-right: 20px;">`;
-        }
-        result += '<hr/><a href="./">Upload more images</a>';
-        res.send(result);
-    });
-});
-app.post('/upload-profile-pic', (req, res) => {
-    // 'profile_pic' is the name of our file input field in the HTML form
-    let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).single('profile_pic');
-
-    upload(req, res, function (err) {
-        // req.file contains information of uploaded file
-        // req.body contains information of text fields, if there were any
-
-        if (req.fileValidationError) {
-            return res.send(req.fileValidationError);
-        }
-        else if (!req.file) {
-            return res.send('Please select an image to upload');
-        }
-        else if (err instanceof multer.MulterError) {
-            return res.send(err);
-        }
-        else if (err) {
-            return res.send(err);
-        }
-
-        // Display uploaded image for user validation
-        res.send(`You have uploaded this image: <hr/><img src="${req.file.path}" width="500"><hr /><a href="./">Upload another image</a>`);
-    });
-});
-router.route('/upload')
-    .post((req, res) => {
-        uploader(req, res, err => {
-            if (err) res.json({ message: "error", details: err });
-            else {
-                if (req.file == undefined) {
-                    res.json({ message: "error", details: "no file selected" });
-                } else {
-                    res.json({
-                        message: "file uploaded",
-                        url: `${server}/upload/${req.file.filename}`
-                    });
-                }
-            }
-        });
-    });
+    }
+}).single('file')
 
 router.route('/')
     .get((req, res) => {
-        // res.render('home');
-        // res.send('<h1> /home --> get,post <Br/> /edit --> delete,put </h1><a href="https://api-home.sixgeat1997.now.sh/home" >home</a> ')
-        res.render('index')
+        res.send('1234')
+    })
+
+app.get('/photo/:path', (req, res) => {
+    return res.sendFile(req.params.path, { root: "upload/" });
+})
+app.post('/photo', (req, res) => {
+    upload(req, res, err => {
+        if (err) res.json({ message: "error", details: err });
+        else {
+            if (req.file == undefined) {
+                res.json({ message: "error", details: "no file selected" });
+            } else {
+                res.json({
+                    message: "file uploaded",
+                    url: `${server}/upload/${req.file.filename}`
+                });
+            }
+        }
     });
+})
+
+
 
 router.route('/home')
     .get((req, res) => {
@@ -235,6 +188,124 @@ app.listen(port, () => {
     console.log("server is running");
 
 })
+
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, "uploads/")
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+//         // cb(
+//         //     null,
+//         //     Date.now() +
+//         //     "_" +
+//         //     file.originalname
+//         //         .split(" ")
+//         //         .join()
+//         //         .replace(",", "_")
+//         // );
+//     }
+
+// })
+// checkFileType = (file, cb) => {
+//     const filetypes = /jpeg|jpg|png|gif/;
+//     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+//     const mimetype = filetypes.test(file.mimetype);
+//     if (mimetype && extname) {
+//         return cb(null, true);
+//     } else {
+//         cb("images only");
+//     }
+// };
+
+// let uploader = multer({
+//     storage,
+//     limits: { fileSize: 9000000 },
+//     fileFilter: (req, file, cb) => {
+//         checkFileType(file, cb);
+//     }
+// }).single("file");
+// app.post('/upload-multiple-images', (req, res) => {
+//     // 10 is the limit I've defined for number of uploaded files at once
+//     // 'multiple_images' is the name of our file input field
+//     let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).array('multiple_images', 10);
+
+//     upload(req, res, function (err) {
+//         if (req.fileValidationError) {
+//             return res.send(req.fileValidationError);
+//         }
+//         // else if (...) // The same as when uploading single images
+
+//         // let result = "You have uploaded these images: <hr />";
+//         let result = []
+//         const files = req.files;
+//         let index, len;
+
+//         // Loop through all the uploaded images and display them on frontend
+//         for (index = 0, len = files.length; index < len; ++index) {
+//             result.push(files[index].path)
+//             // result += `<img src="${files[index].path}" width="300" style="margin-right: 20px;">`;
+//         }
+//         // result += '<hr/><a href="./">Upload more images</a>';
+//         // res.send(result);
+//         console.log(result);
+
+//         res.render('home', { files: result })
+
+//     });
+// });
+
+// app.post('/upload-profile-pic', (req, res) => {
+//     // 'profile_pic' is the name of our file input field in the HTML form
+//     let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).single('profile_pic');
+
+//     upload(req, res, function (err) {
+//         // req.file contains information of uploaded file
+//         // req.body contains information of text fields, if there were any
+
+//         if (req.fileValidationError) {
+//             return res.send(req.fileValidationError);
+//         }
+//         else if (!req.file) {
+//             return res.send('Please select an image to upload');
+//         }
+//         else if (err instanceof multer.MulterError) {
+//             return res.send(err);
+//         }
+//         else if (err) {
+//             return res.send(err);
+//         }
+
+//         // Display uploaded image for user validation
+//         // res.send(`You have uploaded this image: <hr/><img src="image/${req.file.path}" width="500"><hr /><a href="./">Upload another image</a>`);
+//         // res.render('home', { files: req.file })
+//     });
+// });
+// router.route('/upload')
+//     .post((req, res) => {
+//         uploader(req, res, err => {
+//             if (err) res.json({ message: "error", details: err });
+//             else {
+//                 if (req.file == undefined) {
+//                     res.json({ message: "error", details: "no file selected" });
+//                 } else {
+//                     res.json({
+//                         message: "file uploaded",
+//                         url: `${server}/upload/${req.file.filename}`
+//                     });
+//                 }
+//             }
+//         });
+//     });
+
+// router.route('/')
+//     .get((req, res) => {
+//         // res.render('home');
+//         // res.send('<h1> /home --> get,post <Br/> /edit --> delete,put </h1><a href="https://api-home.sixgeat1997.now.sh/home" >home</a> ')
+//         // res.render('index')
+//         res.render('home', { files: req.file })
+
+//     });
 
 // router.route('/upload', upload.single('file'))
 //     .post((req, res) => {
