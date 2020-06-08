@@ -7,27 +7,27 @@
     [
         {
             "src": "/",
-            "dest": "/server.js",
+            "dest": "/app.js",
             "methods": ["GET"]
         },
         {
             "src": "/home",
-            "dest": "/server.js",
+            "dest": "/app.js",
             "methods": ["GET"]
         },
         {
             "src": "/home",
-            "dest": "/server.js",
+            "dest": "/app.js",
             "methods": ["POST"]
         },
         {
             "src": "/edit",
-            "dest": "/server.js",
+            "dest": "/app.js",
             "methods": ["DELETE"]
         },
         {
             "src": "/edit",
-            "dest": "/server.js",
+            "dest": "/app.js",
             "methods": ["PUT"]
         }
     
