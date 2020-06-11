@@ -2,11 +2,13 @@ const express = require('express'),
     router = express.Router(),
     db = require('../config/db')
 
+var my_home = []
+
 router.route('/home')
     .get((req, res) => {
-        let sql = ' SELECT * FROM tbl_home '
+        let sqlget = ' SELECT * FROM tbl_home '
 
-        db.query(sql, (error, results, fields) => {
+        db.query(sqlget, (error, results, fields) => {
             // เกิด error ในคำสั่ง sql
             if (error) return res.status(500).json({
                 "status": 500,
@@ -20,38 +22,27 @@ router.route('/home')
             return res.json(my_home)
 
         })
-        // res.json(myhome)
+     
+
+
     })
+
+
     .post((req, res) => {
         // console.log(req.body);
+
         var h_id = my_home.length > 0 ? my_home[my_home.length - 1].h_id + 1 : 0
 
-        // keephome.name = req.body.name
-        // keephome.des = req.body.des
-        // keephome.latitude = req.body.latitude
-        // keephome.longitude = req.body.longitude
-        // keephome.price = req.body.price
-        // keephome.area = req.body.area
-        // keephome.type = req.body.type
-        // keephome.category = req.body.category
-        // keephome.tel = req.body.tel
-        // myhome.push(keephome)
 
-
-        // if (!req.files)
-        //     return res.status(400).send('No files were uploaded.');
-        console.log(my_home);
-
-
-        let sql = ' INSERT INTO tbl_home SET ? '
-        db.query(sql, { ...req.body, h_id: h_id }, (error, results, fields) => {
+        let sqlpost = ' INSERT INTO tbl_home SET ? '
+        db.query(sqlpost, { ...req.body, h_id: h_id }, (error, results, fields) => {
             console.log(error)
             if (error) {
                 throw error
             }
-            console.log(results.insertId)
-            console.log(results)
-            console.log(fields)
+            // console.log(results.insertId)
+            // console.log(results)
+            // console.log(fields)
             // res.json(results)
         })
         res.json({ message: "success" })

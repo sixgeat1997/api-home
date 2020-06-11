@@ -2,7 +2,9 @@ const path = require('path'),
     fs = require('fs'),
     multer = require('multer'),
     express = require('express'),
-    ImageRouter = express.Router()
+    ImageRouter = express.Router(),
+    fileUpload = require('express-fileupload'),
+    db = require('../config/db')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -43,49 +45,36 @@ ImageRouter.route('/photo/:path')
 
 ImageRouter.route('/photo')
     .post((req, res) => {
-
         // let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).array('file', 10);
         upload(req, res, function (err) {
-            // console.log(req.files);
 
-            // res.send(req.files)
 
-            // let result = []
-            // const files = req.files;
-            // let index, len;
+            if (req.fileValidationError) {
+                return res.send(req.fileValidationError);
+            }
 
-            // for (index = 0, len = files.length; index < len; ++index) {
-            //     // res.send(files[index])
+            let result = []
+            const files = req.files;
+            let index, len;
 
-            // }
+            var sql = "INSERT INTO file_img SET ?"
+            for (index = 0, len = files.length; index < len; ++index) {
+                result.push(files[index])
+                var newfiles = {
+                    name: files[index].filename,
+                    type: files[index].mimetype,
+                    size: files[index].size,
+                    // id: my_home.length > 0 ? my_home[my_home.length - 1].h_id + 1 : 0
+                }
 
-            // if (req.fileValidationError) {
-            //     return res.send(req.fileValidationError);
-            // }
+                db.query(sql, newfiles, function (err, result) {
+                    console.log('inserted data');
+                });
 
-            // let result = []
-            // const files = req.files;
-            // let index, len;
+            }
 
-            // // var sql = "INSERT INTO file_img SET ?"
-            // for (index = 0, len = files.length; index < len; ++index) {
-            //     result.push(files[index])
-            //     var newfiles = {
-            //         name: files[index].filename,
-            //         type: files[index].mimetype,
-            //         size: files[index].size,
-
-            //         id: my_home.length > 0 ? my_home[my_home.length - 1].h_id + 1 : 0
-            //     }
-
-            //     // db.query(sql, newfiles, function (err, result) {
-            //     //     console.log('inserted data');
-            //     // });
-
-            // }
-
-            // res.send(result);
-            // console.log(result);
+            res.send(result);
+            console.log(result);
         })
 
 

@@ -1,9 +1,9 @@
 const express = require('express'),
     bodyParser = require('body-parser'),
-    rest = require('./routes/Rest'),
+    Rest = require('./routes/Rest'),
     path = require('path'),
     cors = require('cors'),
-    helpers = require('./helpers'),
+    search = require('./routes/Search'),
     ImageRouter = require('./routes/image'),
     port = process.env.PORT || 8888,
     router = express.Router(),
@@ -81,7 +81,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/upload', ImageRouter)
-app.use('/api', rest)
+app.use('/api', Rest)
+app.use('/search', search)
 
 
 
