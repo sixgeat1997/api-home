@@ -3,11 +3,12 @@ const express = require('express'),
     Rest = require('./routes/Rest'),
     path = require('path'),
     cors = require('cors'),
-    search = require('./routes/Search'),
+    Search = require('./routes/Search'),
     ImageRouter = require('./routes/image'),
     port = process.env.PORT || 8888,
     router = express.Router(),
-    app = express()
+    app = express(),
+    Register = require('./routes/Register')
 
 
 app.use(cors())
@@ -82,8 +83,8 @@ app.get('/', (req, res) => {
 
 app.use('/upload', ImageRouter)
 app.use('/api', Rest)
-app.use('/search', search)
-
+app.use('/search', Search)
+app.use('/auth', Register)
 
 
 app.use("*", (req, res) => res.status(404).send("404 not found"))
