@@ -5,6 +5,10 @@ const path = require('path'),
     ImageRouter = express.Router(),
     fileUpload = require('express-fileupload'),
     db = require('../config/db')
+    
+
+var imgModel = require('../model/Image');
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -49,32 +53,54 @@ ImageRouter.route('/photo')
         upload(req, res, function (err) {
 
 
-            if (req.fileValidationError) {
-                return res.send(req.fileValidationError);
-            }
+            // if (req.fileValidationError) {
+            //     return res.send(req.fileValidationError);
+            // }
 
             let result = []
             const files = req.files;
             let index, len;
 
-            var sql = "INSERT INTO file_img SET ?"
-            for (index = 0, len = files.length; index < len; ++index) {
-                result.push(files[index])
-                var newfiles = {
-                    name: files[index].filename,
-                    type: files[index].mimetype,
-                    size: files[index].size,
-                    // id: my_home.length > 0 ? my_home[my_home.length - 1].h_id + 1 : 0
-                }
+            console.log(files);
 
-                db.query(sql, newfiles, function (err, result) {
-                    console.log('inserted data');
-                });
 
-            }
+            // var obj = {
+            //     name: files.filename,
 
-            res.send(result);
-            console.log(result);
+            //     img: {
+            //         data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)),
+            //         contentType: 'image/png'
+            //     }
+            // }
+            // imgModel.create(obj, (err, item) => {
+            //     if (err) {
+            //         console.log(err);
+            //     }
+            //     else {
+            //         // item.save(); 
+            //         res.redirect('/');
+            //     }
+            // });
+
+            // var sql = "INSERT INTO file_img SET ?"
+            // for (index = 0, len = files.length; index < len; ++index) {
+            //     result.push(files[index])
+            //     var newfiles = {
+            //         name: files[index].filename,
+            //         type: files[index].mimetype,
+            //         size: files[index].size,
+            //         // id: my_home.length > 0 ? my_home[my_home.length - 1].h_id + 1 : 0
+            //     }
+            // }
+
+            //     db.query(sql, newfiles, function (err, result) {
+            //         console.log('inserted data');
+            //     });
+
+            // }
+
+            // res.send(result);
+            // console.log(result);
         })
 
 

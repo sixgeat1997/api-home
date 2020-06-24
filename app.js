@@ -8,7 +8,9 @@ const express = require('express'),
     port = process.env.PORT || 8888,
     router = express.Router(),
     app = express(),
-    Register = require('./routes/Register')
+    Register = require('./routes/Register'),
+    mongoose = require('mongoose'),
+    imgMonog = require('./routes/MongImg')
 
 
 app.use(cors())
@@ -85,6 +87,14 @@ app.use('/upload', ImageRouter)
 app.use('/api', Rest)
 app.use('/search', Search)
 app.use('/auth', Register)
+app.use('/mongo', imgMonog)
+
+mongoose.connect(`mongodb+srv://newhome:chayanon26+@cluster0-zb5mq.mongodb.net/newhome?retryWrites=true&w=majority`, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+}, () => {
+    console.log("connect to db");
+})
 
 
 app.use("*", (req, res) => res.status(404).send("404 not found"))

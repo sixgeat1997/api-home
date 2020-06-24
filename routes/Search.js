@@ -35,30 +35,6 @@ search.route('/price')
 
     })
 
-search.route('/category')
-    .get((req, res) => {
-        let sqlget = ' SELECT * FROM tbl_home '
-        const category = req.body.category
-        console.log(category);
-
-        db.query(sqlget, (error, results, fields) => {
-            // เกิด error ในคำสั่ง sql
-            if (error) return res.status(500).json({
-                "status": 500,
-                "message": "Internal Server Error" // error.sqlMessage
-            })
-            my_home = results
-
-            const pass = my_home.filter((item) => {
-                if (item.category == category)
-                    return item
-            })
-            console.log(pass);
-            res.json(pass)
-
-        })
-
-    })
 
 search.route('/location')
     .get((req, res) => {

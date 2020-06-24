@@ -1,11 +1,17 @@
 const express = require('express'),
     register = express.Router(),
-    bcryptjs = require('bcryptjs')
+    bcryptjs = require('bcryptjs'),
+    { regisValidation, loginValidation } = require('../validator/Valid_user')
 
 const list_user = []
 
 register.route('/register')
     .post((req, res) => {
+
+        const { error } = regisValidation(req.body)
+
+        if (error) return res.status(400).send(error.details[0].message)
+
         const user = {}
         user.username = req.body.username
         user.password = bcryptjs.hashSync(req.body.password)
@@ -20,6 +26,7 @@ register.route('/register')
 
 
     })
+
 register.route('/login')
     .post((req, res) => {
         const user = req.body.username
